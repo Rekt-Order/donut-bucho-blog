@@ -41,10 +41,12 @@ npm run dev
 
 ## デプロイ
 
+Cloudflare Pages用のビルド:
 ```bash
-npm run build
-npm start
+npm run cf:build
 ```
+
+本番環境: https://donut-bucho-blog.jose-19840804.workers.dev/
 
 ## 技術スタック
 
