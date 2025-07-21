@@ -9,15 +9,32 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Standard build for Cloudflare Pages (not static export)
+  // Cloudflare Pages configuration
   trailingSlash: true,
-  // Disable image optimization for static export
   images: {
     unoptimized: true,
   },
   // Enable experimental features
   experimental: {
     optimizePackageImports: ['framer-motion', '@sanity/client'],
+  },
+  // Cloudflare Pages compatibility
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+        ],
+      },
+    ];
   },
 };
 
