@@ -13,6 +13,9 @@ import AkiraScanningOverlay from '@/components/AkiraScanningOverlay'
 import DonutHeader from '@/components/DonutHeader'
 import DonutFooter from '@/components/DonutFooter'
 
+// Configure Edge Runtime for Cloudflare Pages
+export const runtime = 'edge'
+
 interface PageProps {
   params: Promise<{
     slug: string
