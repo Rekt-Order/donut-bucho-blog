@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import AkiraBackground from './AkiraBackground'
 import AkiraGlitchText from './AkiraGlitchText'
+import dynamic from 'next/dynamic'
 
 // Type definitions for Leaflet
 declare global {
@@ -23,17 +24,24 @@ interface MapData {
   descriptionText: string
 }
 
-export default function CaravanMap() {
+// Map component that only renders on client side
+function MapComponent() {
   const mapRef = useRef<HTMLDivElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [map, setMap] = useState<any>(null)
   const mapInstanceRef = useRef<any>(null)
   const [activeMarkers, setActiveMarkers] = useState(0)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    // Load Leaflet dynamically
+    setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    // Only load Leaflet on client side after component is mounted
+    if (!isMounted || typeof window === 'undefined') return
+
     const loadLeaflet = async () => {
-      if (typeof window === 'undefined') return
 
       // Load Leaflet CSS
       const cssLink = document.createElement('link')
@@ -238,7 +246,7 @@ export default function CaravanMap() {
         mapInstanceRef.current = null
       }
     }
-  }, [])
+  }, [isMounted])
 
   const fetchSpreadsheetData = async (mapInstance: any, icons: any) => {
     try {
@@ -299,6 +307,26 @@ export default function CaravanMap() {
     if (mapInstanceRef.current) {
       mapInstanceRef.current.setView([34.68869925776078, 135.52476523948252], 13)
     }
+  }
+
+  // Don't render anything until mounted on client
+  if (!isMounted) {
+    return (
+      <div className="relative min-h-screen bg-black overflow-hidden">
+        <AkiraBackground />
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="relative mb-6">
+              <div className="w-16 h-16 border-2 border-gray-600 border-t-white rounded-full animate-spin mx-auto"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-8 h-8 bg-white rounded-full animate-pulse"></div>
+              </div>
+            </div>
+            <p className="font-mono text-sm text-white">INITIALIZING_MAP_SYSTEM...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -688,3 +716,26 @@ export default function CaravanMap() {
     </div>
   )
 }
+
+// Dynamic import to prevent SSR issues
+const CaravanMap = dynamic(() => Promise.resolve(MapComponent), {
+  ssr: false,
+  loading: () => (
+    <div className="relative min-h-screen bg-black overflow-hidden">
+      <AkiraBackground />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="relative mb-6">
+            <div className="w-16 h-16 border-2 border-gray-600 border-t-white rounded-full animate-spin mx-auto"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-8 h-8 bg-white rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <p className="font-mono text-sm text-white">LOADING_MAP_INTERFACE...</p>
+        </div>
+      </div>
+    </div>
+  )
+})
+
+export default CaravanMap
