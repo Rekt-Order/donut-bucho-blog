@@ -21,7 +21,7 @@ export default function DonutFooter() {
       { name: 'TRAITS', href: '/traits' }
     ],
     'OTHER': [
-      { name: 'BEANZ', href: '/beanz' },
+      { name: 'DONUTS', href: '/donuts' },
       { name: 'LICENSE', href: '/license' },
       { name: 'TERMS & CONDITIONS', href: '/terms' },
       { name: 'HELP', href: '/help' }
@@ -154,7 +154,7 @@ export default function DonutFooter() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Social Links */}
             <div className="flex items-center space-x-6">
-              <span className="text-gray-400 text-sm font-medium">BEANZ</span>
+              <span className="text-gray-400 text-sm font-medium">DONUTS</span>
               <div className="flex space-x-4">
                 {socialIcons.map((social) => (
                   <Link 
@@ -171,7 +171,7 @@ export default function DonutFooter() {
 
             {/* Copyright */}
             <div className="text-gray-500 text-sm">
-              © 2024 Donut Bucho. All rights reserved.
+              © 2021 BOSS-DONUT. All rights reserved.
             </div>
           </div>
         </div>

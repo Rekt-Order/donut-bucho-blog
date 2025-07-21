@@ -29,6 +29,19 @@ async function getPost(slug: string): Promise<BlogPost | null> {
   }
 }
 
+// Generate static paths for all posts
+export async function generateStaticParams() {
+  try {
+    const posts = await client.fetch(`*[_type == "post" && defined(slug.current)] { slug }`)
+    return posts.map((post: any) => ({
+      slug: post.slug.current,
+    }))
+  } catch (error) {
+    console.error('Error generating static params:', error)
+    return []
+  }
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const post = await getPost(slug)
@@ -312,5 +325,3 @@ export default async function ArticlePage({ params }: PageProps) {
   )
 }
 
-// Configure Edge Runtime for Cloudflare Pages
-export const runtime = 'edge'
