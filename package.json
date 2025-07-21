@@ -9,7 +9,8 @@
     "lint": "next lint",
     "pages:build": "npx @cloudflare/next-on-pages",
     "pages:deploy": "npm run pages:build && wrangler pages deploy",
-    "pages:dev": "npx @cloudflare/next-on-pages --dev"
+    "pages:dev": "npx @cloudflare/next-on-pages --dev",
+    "cf:build": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
     "@portabletext/react": "^3.2.1",
@@ -29,6 +30,7 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.12",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
