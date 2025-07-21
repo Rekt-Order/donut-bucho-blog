@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>全国勝手に部長コラボキャラバンMAP</title>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8THNE1EX7N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-8THNE1EX7N');
+</script>
+
+  <!-- Bootstrapのリンク -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- LeafletのCSSファイルを読み込む -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+  <!-- LeafletのJavaScriptファイルを読み込む -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+  <!-- GoogleスプレッドシートのAPIKeyを隠す -->  
+  <script type="text/javascript" src="apikey.js"></script>
+
+  <!-- plugin -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/L.Control.Locate.min.css" />
+  <script src="js/L.Control.Locate.min.js"></script>
+  <!-- plugin -->
+
+  <!-- plugin -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/leaflet-sidebar.min.css" />
+  <script src="js/leaflet-sidebar.min.js"></script>
+  <!-- plugin -->
+
+  <!-- Google Fontsのリンク -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shizuru&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Darumadrop+One&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  
+  <!-- 地図のスタイルを定義する -->
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background-color: #EDEDED; /* 背景色を変更 */
+    }
+    
+    /* アイコンポップアップの概要欄のスタイル */
+    .description-text {
+    font-size: 11px; /* または任意のサイズ */
+    }
+
+    /* ボタンの設置場所を設定 */
+    #map-top-controls {
+      position: absolute;
+      top: calc(400px + 20px); /* 画像の高さ + 画像下の余白 */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      margin-top: 20px; /* ボタンの上部に20ピクセルのマージンを追加 */
+      margin-bottom: 10px; /* ボタンの下部に20ピクセルのマージンを追加 */
+    }
+
+    /* ボタン間の余白を設定 */
+    #map-top-controls .btn {
+      margin-right: 20px; /* 右側に10pxの余白 */
+    }
+
+    /* トップバナーのスタイル */
+    #top-banner {
+      height: 200px;
+      background-color: #2F9671;
+      border-bottom: 1px solid white;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      line-height: 1;
+      align-items: center;
+      font-family: 'Darumadrop One', cursive; /* Shizuruフォントを適用 */
+      font-size: 80px; /* 必要に応じてフォントサイズを調整 */
+      color: white; /* テキストの色 */
+    }
+  
+    /* マップの余白を設定 */
+    #map {
+      width: calc(100% - 60px);
+      height: calc(100% - 260px); /* トップバナーの高さと余白を考慮 */
+      margin: 30px;
+    }
+  
+     /* サイドバーの位置を調整 */
+    #sidebar {
+    margin-top: 480px; /* トップバナーの下に200pxのスペースを作る */
+    margin-left: 30px; /* 左に30pxのスペースを作る */
+    height: 400px; /* サイドバーの高さを600pxに設定 */
+    overflow-y: auto; /* 内容が高さを超えた場合にスクロールバーを表示 */
+    }
+
+    /* レスポンシブ対応のスタイル */
+  @media (max-width: 600px) {
+    #top-banner {
+      height: 100px; /* スマートフォンではバナーの高さを小さくする */
+    }
+
+    #map {
+      width: calc(100% - 20px);
+      height: calc(100% - 140px); /* バナーの高さと余白を調整 */
+      margin: 10px;
+    }
+
+    #sidebar {
+      margin-top: 100px; /* スマートフォンではサイドバーの位置を調整 */
+      height: 400px; /* スマートフォンでもサイドバーの高さは600pxに保持 */
+    }
+  }
+
+    .btn-custom1 {
+      background-color: #009999; /* 任意の色 */
+      color: white; /* テキストの色 */
+    }
+
+    .btn-custom2 {
+      background-color: #336666; /* 任意の色 */
+      color: white; /* テキストの色 */
+    }
+
+    .btn-custom3 {
+      background-color: #FF8C00; /* 任意の色 */
+      color: white; /* テキストの色 */
+    }
+
+    .btn-custom4 {
+      background-color: #FF4F50; /* 任意の色 */
+      color: white; /* テキストの色 */
+    }
+
+    .responsive-image {
+      margin-top: 20px; /* top-bannerとの間に20ピクセルの隙間を追加 */
+      margin-bottom: 20px; /* 画像の下部に20ピクセルの隙間を追加 */
+      width: 100%; /* 横幅をレスポンシブにする */
+      height: 220px; /* 高さを150ピクセルに固定 */
+      object-fit: cover; /* 画像が枠に収まるよう調整 */
+    }
+
+
+    /* ズーム情報コントロールのスタイル */
+    .zoom-info-control {
+      padding: 6px 8px;
+      font-size: 14px;
+      font-family: 'Darumadrop One', cursive;
+      background: white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+
+
+    /* ズーム情報コントロールの位置調整 */
+    .leaflet-top.leaflet-right {
+      left: 10px; /* 左側の余白を設定 */
+    }
+
+
+  </style>
+</head>
+<body>
+  
+  <div id="top-banner">
+    <!-- バナーにテキストを挿入 -->
+    <span>ドーナツぶちょうと<br>たからのちず</span>
+  </div>
+
+  <img src="Description.png" class="responsive-image" alt="マップの説明">
+
+  <div id="sidebar" class="sidebar collapsed">
+    <!-- メニュー全体のdiv要素 -->
+    <div class="sidebar-tabs">
+      <!-- 各メニューを定義 -->
+      <ul role="tablist">
+          <li><a href="https://www.mooon.app/ja/collections/DFwGiFMGCsN2QJxbkNpH" target="_blank"><i class="fa-solid fa-globe"></i></a></li>
+          <li><a href="#about" role="tab"><i class="fa fa-user-circle"></i> </a></li>
+          <li><a href="#howto" role="tab"><i class="fa-solid fa-location-dot"></i> </a></li>
+          <li><a href="https://twitter.com/WinstonDreamer" target="_blank"><i class="fa-brands fa-x-twitter"></i> </a></li>
+          <li><a href=" https://app.box.com/s/9hhwj1uhchcv4u6qsbcqqpm5wewe8x03" target="_blank"><i class="fa-solid fa-shop"></i> </a></li>
+          <li><a href="https://stand.fm/channels/60eaee4a04bb1691c12aa547" target="_blank"><i class="fa-solid fa-wave-square"></i> </a></li>
+          <li><a href="https://discord.gg/4hcyMpHqF9" target="_blank"><i class="fa-brands fa-discord"></i> </a></li>
+      </ul>
+  </div>
+  
+<!-- メニュークリック時の詳細なコンテンツ -->
+<div class="sidebar-content">
+
+  <!-- アバウトセクション -->
+  <div class="sidebar-pane" id="about">
+      <h1 class="sidebar-header">ドーナツ部長とは？<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+      <!-- 長文のプロフィールをここに挿入 -->
+      <p>「ある朝のこと。目を覚ました部長は、自分の体にすっぽりとドーナツがハマっていることに気づきました。しかし大好きなドーナツだったため、それ以上、気にすることはありませんでした」<br><br>
+
+        大好きなドーナツとの共同生活を楽しむ「ドーナツ部長」です。</p>
+  </div>
+
+  <!-- 遊び方セクション -->
+  <div class="sidebar-pane" id="howto">
+    <h1 class="sidebar-header">楽しみ方<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+    <!-- 遊び方をここに挿入 -->
+    <p>部長が立っている場所「ドーナツ・スポット」では、もしかしたら現在進行形でNFT関連のイベントが開催中かもしれません。それとも、イベントはとっくに終了していて、過去の記憶にしか存在しないかもしれませんが、部長はこの場所で、誰かが手に入れてくれるまで待っています。<br><br>
+
+      ここでの部長は、ガス代（手数料）不要で受け取ることができます。
+    </p>
+</div>
+
+</div>
+</div>
+
+<!-- マップの上部に配置するボタン -->
+<div id="map-top-controls" class="custom-control">
+  <a href="xxxx" target="_blank" class="btn btn-custom1">修理中…</a>
+  <a href="https://opensea.io/collection/wearable-donuts" target="_blank" class="btn btn-custom1">部長を見てみる</a>
+  <button type="button" class="btn btn-custom3" onclick="jumpToLocation()">大阪へジャンプ</button>
+  <a href="https://twitter.com/WinstonDreamer" target="_blank" class="btn btn-custom4">問い合わせボタン（工事中）</a>
+</div>
+
+<script>
+  // マップの特定の位置にジャンプする関数
+  function jumpToLocation() {
+    map.setView([34.68869925776078, 135.52476523948252], 13); // 大阪城の位置へ飛ぶ
+  }
+</script>
+
+
+
+<div id="map"></div>
+
+
+
+<script>
+  // サイト全体での右クリックを禁止
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+
+
+// 地図を表示する要素を指定し、地図の中心座標とズームレベルを設定
+// また、ズームレベルが2以下にならないようにminZoomオプションを設定
+const map = L.map('map', {
+  minZoom: 3  // 最小ズームレベルを2に設定
+}).setView([35.7294069, 139.7107928], 13);
+  
+  // OpenStreetMapをタイルレイヤーとして追加
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    opacity: 0.5 // 50%の透明度
+  }).addTo(map);
+  
+  // カスタムコントロールを作成
+  var ZoomInfoControl = L.Control.extend({
+    options: {
+      position: 'topright'
+    },
+  
+    onAdd: function(map) {
+      // コントロールのコンテナを作成
+      var container = L.DomUtil.create('div', 'zoom-info-control');
+      container.innerHTML = 'Lv: ' + map.getZoom();
+      // マップズームイベントをリッスン
+      map.on('zoomend', function() {
+        container.innerHTML = 'Lv: ' + map.getZoom();
+      });
+      return container;
+    }
+  });
+  
+  // カスタムコントロールをマップに追加
+  map.addControl(new ZoomInfoControl());
+
+  // ズームコントローラーの位置を右上に変更
+  map.zoomControl.setPosition('topright');
+  // メニューをマップに追加
+  const sidebar = L.control.sidebar('sidebar').addTo(map);
+
+  // Locate
+  const option = {
+  position: 'topright',
+  strings: {
+      title: "現在地を表示",
+      popup: "現在地はココ"
+  },
+  locateOptions: {
+    maxZoom: 18
+  }
+  }
+
+const lc = L.control.locate(option).addTo(map);
+
+// 新しいアイコンを定義：icon1～icon10まで
+const icon1 = L.icon({
+  iconUrl: 'icon.png', 
+  iconSize: [95, 95], 
+  iconAnchor: [22, 70], 
+  popupAnchor: [13, -45] 
+});
+
+const icon2 = L.icon({
+  iconUrl: 'icon2.png', 
+  iconSize: [95, 95], 
+  iconAnchor: [22, 70], 
+  popupAnchor: [13, -45] 
+});
+
+const icon3 = L.icon({
+  iconUrl: 'icon3.png', 
+  iconSize: [95, 95], 
+  iconAnchor: [22, 70], 
+  popupAnchor: [13, -45] 
+});
+
+// 新しいアイコンを定義
+const icon4 = L.icon({
+  iconUrl: 'icon4.png', 
+  iconSize: [40, 40], 
+  iconAnchor: [20, 40], 
+  popupAnchor: [13, -45]
+});
+
+const icon5 = L.icon({
+  iconUrl: 'icon5.png', 
+  iconSize: [95, 95], 
+  iconAnchor: [22, 70], 
+  popupAnchor: [13, -45] 
+});
+
+const icon6 = L.icon({
+  iconUrl: 'icon6.png', 
+  iconSize: [95, 95], 
+  iconAnchor: [22, 70], 
+  popupAnchor: [13, -45] 
+});
+
+const icon7 = L.icon({
+  iconUrl: 'icon7.gif', 
+  iconSize: [90, 90], 
+  iconAnchor: [22, 70], 
+  popupAnchor: [13, -45] 
+});
+
+const icon8 = L.icon({
+  iconUrl: 'icon8.png', 
+  iconSize: [50, 50], 
+  iconAnchor: [25, 50], 
+  popupAnchor: [13, -45]
+});
+
+const icon9 = L.icon({
+  iconUrl: 'icon9.png', 
+  iconSize: [60, 60], 
+  iconAnchor: [30, 60], 
+  popupAnchor: [13, -45]
+});
+
+const icon10 = L.icon({
+  iconUrl: 'icon10.png', 
+  iconSize: [60, 60], 
+  iconAnchor: [30, 60], 
+  popupAnchor: [13, -45]
+});
+
+
+  // スプレッドシートからデータを取得
+  function fetchSpreadsheetData() {
+    const spreadsheetId = '1v713hgtLaMM3gaWKLen3oxdKk-FhNdtBSgbhykNe85s'; // スプレッドシートID
+    const range = 'Sheet1!A2:H'; // 例: 'Sheet1!A2:G'
+    const apiKey = config.apikey // Google APIキー
+    console.log
+
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        addMarkersToMap(data.values);
+      });
+  }
+
+// マップにマーカーを追加
+function addMarkersToMap(data) {
+  data.forEach(row => {
+    const latitude = row[0]; // 緯度
+    const longitude = row[1]; // 経度
+    const content = row[2]; // ポップアップの内容
+    const imageUrl = row[3]; // 画像のURL
+    const linkUrl = row[4]; // リンクURL
+    const iconFlag = row[5]; // F列のフラグ
+    const customText = row[6]; // G列のデータ (カスタムテキスト)
+    const descriptionText = row[7] ? row[7] : 'ここでは、大切なものが見つけられるかもしれません。'; // H列のデータ (説明文)
+
+
+
+      // アイコンをフラグに応じて切り替え：icon1～icon10まで
+      let selectedIcon;
+    if(iconFlag === '1') {
+      selectedIcon = icon1;
+    } else if(iconFlag === '2') {
+      selectedIcon = icon2;
+    } else if(iconFlag === '3') {
+      selectedIcon = icon3;
+    } else if(iconFlag === '4') {
+    selectedIcon = icon4;
+    } else if(iconFlag === '5') {
+    selectedIcon = icon5;
+    } else if(iconFlag === '6') {
+    selectedIcon = icon6;
+    } else if(iconFlag === '7') {
+    selectedIcon = icon7;
+    } else if(iconFlag === '8') {
+    selectedIcon = icon8;
+    } else if(iconFlag === '9') {
+    selectedIcon = icon9;
+    } else if(iconFlag === '10') {
+    selectedIcon = icon10;
+    } else {
+      // デフォルトアイコンを設定
+      selectedIcon = icon1; 
+    }
+
+
+// URLをHTMLリンクに変換し、G列のテキストをリンクテキストとして使用
+const link = `<a href="${linkUrl}" target="_blank">${customText}</a>`;
+
+// 画像をHTMLで埋め込む
+const imageHtml = `<img src="${imageUrl}" alt="Image" style="width:100%;height:auto;">`;
+
+// ポップアップの内容を組み立てる
+const popupContent = `${content}<br>${imageHtml}<br>${link}<br><span class="description-text">${descriptionText}</span>`;
+
+
+// マーカーを作成してポップアップを設定
+const marker = L.marker([latitude, longitude], {icon: selectedIcon, riseOnHover: true}).addTo(map);
+marker.bindPopup(popupContent);
+});
+}
+
+
+
+  // ページが読み込まれたときにデータを取得
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchSpreadsheetData();
+
+  });
+
+  // 十字マークを地図中央に表示
+
+  const crossIcon = L.icon({
+    iconUrl: 'https://maps.gsi.go.jp/image/map/crosshairs.png',
+    iconSize: [32, 32], 
+    iconAnchor: [16, 16] 
+  });
+
+  const crossMarker = L.marker( map.getCenter(),{
+    icon:crossIcon,  
+    zIndexOffset:1000, 
+    interactive:false 
+  }).addTo(map);
+
+
+map.on('move', function(e) {
+  crossMarker.setLatLng(map.getCenter());
+});
+
+// 現在地を取得して、地図を描画する
+
+function getgeo() {
+  map.on('locationerror', onLocationError);
+  map.locate({
+    setView: "true"
+  });
+}
+
+function onLocationError(e) {
+  alert(e.message);
+}
+
+
+function fetchSpreadsheetDataForMovingIcon() {
+  const spreadsheetId = '1v713hgtLaMM3gaWKLen3oxdKk-FhNdtBSgbhykNe85s';
+  const range = 'Sheet2!A2:H';
+  const apiKey = config.apikey;
+
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      setupMovingIcon(data.values);
+    });
+}
+
+
+
+// 動くアイコンのグローバル変数
+var movingIcon;
+
+function setupMovingIcon(data) {
+  // ここでSheet2のデータから特定の行を選択
+  const specificRow = data[0]; // 例えば、最初の行を使用
+
+  const latitude = specificRow[0];
+  const longitude = specificRow[1];
+  const content = specificRow[2];
+  const imageUrl = specificRow[3];
+  const linkUrl = specificRow[4];
+  const customText = specificRow[5];
+  const descriptionText = specificRow[6] ? specificRow[6] : '説明文';
+
+  const imageHtml = `<img src="${imageUrl}" alt="Image" style="width:100%;height:auto;">`;
+  const link = `<a href="${linkUrl}" target="_blank">${customText}</a>`;
+  const popupContent = `${content}<br>${imageHtml}<br>${link}<br><span class="description-text">${descriptionText}</span>`;
+
+  // 動くアイコンの設定
+  movingIcon = L.marker([latitude, longitude], {icon: icon5}).addTo(map);
+  movingIcon.bindPopup(popupContent);
+
+  moveIcon(movingIcon); // アイコンの動的移動を開始
+}
+
+// 地図のズームレベルが変更された時のイベントハンドラ
+map.on('zoomend', function() {
+  if (map.getZoom() < 10) {
+    if (movingIcon) {
+      movingIcon.remove(); // ズームレベルが10未満の場合、アイコンを非表示にする
+    }
+  } else {
+    if (movingIcon) {
+      movingIcon.addTo(map); // ズームレベルが10以上の場合、アイコンを表示する
+    }
+  }
+});
+
+function moveIcon(marker) {
+  var animate = function() {
+    var currentLatLng = marker.getLatLng();
+    var newLat = currentLatLng.lat + (Math.random() - 0.5) * 0.03;
+    var newLng = currentLatLng.lng + (Math.random() - 0.5) * 0.03;
+    marker.setLatLng([newLat, newLng]);
+
+    requestAnimationFrame(animate);
+  };
+
+  animate();
+}
+
+// スプレッドシートから動くアイコンのデータを取得
+document.addEventListener('DOMContentLoaded', function() {
+  fetchSpreadsheetDataForMovingIcon();
+});
+
+
+
+</script>
+
+</body>
+</html>
