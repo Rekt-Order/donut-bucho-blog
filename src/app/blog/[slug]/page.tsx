@@ -9,9 +9,6 @@ import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import DonutHeader from '@/components/DonutHeader'
 
-// Configure Edge Runtime for Cloudflare Pages
-export const runtime = 'edge'
-
 interface PageProps {
   params: Promise<{
     slug: string
@@ -257,3 +254,6 @@ export default async function BlogPost({ params }: PageProps) {
     </>
   )
 }
+
+// Configure Edge Runtime for Cloudflare Pages
+export const runtime = 'edge'
